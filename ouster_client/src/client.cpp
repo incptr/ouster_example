@@ -155,12 +155,16 @@ SOCKET udp_data_socket(int port) {
 SOCKET cfg_socket(const char* addr) {
     struct addrinfo hints, *info_start, *ai;
 
+    uint8 debug_cc = 0;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
     // try to parse as numeric address first: avoids spurious errors from DNS
     // lookup when not using a hostname (and should be faster)
+    debug_cc++;
+    std::cerr << debug_cc << std:endl;
+    
     hints.ai_flags = AI_NUMERICHOST;
     int ret = getaddrinfo(addr, "7501", &hints, &info_start);
     if (ret != 0) {
@@ -172,11 +176,17 @@ SOCKET cfg_socket(const char* addr) {
             return SOCKET_ERROR;
         }
     }
+    
+    debug_cc++;
+    std::cerr << debug_cc << std:endl;
 
     if (info_start == NULL) {
         std::cerr << "cfg getaddrinfo(): empty result" << std::endl;
         return SOCKET_ERROR;
     }
+    
+    debug_cc++;
+    std::cerr << debug_cc << std:endl;
 
     SOCKET sock_fd;
     for (ai = info_start; ai != NULL; ai = ai->ai_next) {
@@ -186,6 +196,9 @@ SOCKET cfg_socket(const char* addr) {
                       << std::endl;
             continue;
         }
+        
+        debug_cc++;
+        std::cerr << debug_cc << std:endl;
 
         if (connect(sock_fd, ai->ai_addr, (socklen_t)ai->ai_addrlen) < 0) {
             impl::socket_close(sock_fd);
